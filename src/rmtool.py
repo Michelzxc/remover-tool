@@ -21,6 +21,14 @@ __version__ = "0.1.0"
 __date__ = "2022-12-13"
 
 
+def help_flag():
+    """Print manual page."""
+
+    print("Usage: rmtool [options] folder")
+    print("Options:")
+    print("<<< definir opciones posteriormente >>>")
+
+
 def version_flag(version: str, date: str) -> None:
     """Print a notice of program information."""
 
