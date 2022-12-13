@@ -16,12 +16,54 @@
 # or see <https://github.com/Michelzxc/remover-tool/>.
 #
 # ----------------------------------------------------------------------
+import os
+import sys
 
 __version__ = "0.1.0"
 __date__ = "2022-12-13"
 
 
-def help_flag():
+def make_usr_folders(platform: str) -> None:
+    """Make main, config and data folders in platform win32 or linux.
+    .remover-tool/ folder save configuration and data of user.
+    """
+
+    # Make folders for Linux
+    if platform == "linux":
+        home_path = os.getenv("HOME")
+        main_folder = home_path + "/.remover-tool"
+        config_folder = main_folder + "/config"
+        data_folder = main_folder + "/data"
+
+        for path in [main_folder, config_folder, data_folder]:
+            try:
+                os.mkdir(path)
+
+            except FileExistsError:
+                print("[!] Folder is already exist: %s" % path)
+
+    # Make folders for Windows
+    elif platform == "win32":
+
+        # <<< It is necessary to verify the working of this block. >>>
+
+        home_path = os.getenv("HOME")
+        main_folder = home_path + "/AppData/Local/remover-tool"
+        config_folder = main_folder + "/config"
+        data_folder = main_folder + "/data"
+
+        for path in [main_folder, config_folder, data_folder]:
+            try:
+                os.mkdir(path)
+
+            except FileExistsError:
+                print("[!] Folder is already exist: %s" % path)
+
+    else:
+        print("[!] Platform [%s] isn't defined.")
+
+
+def help_flag() -> None:
     """Print manual page."""
 
     print("Usage: rmtool [options] folder")
@@ -42,7 +84,7 @@ def version_flag(version: str, date: str) -> None:
           "This program comes with ABSOLUTELY NO WARRANTY.")
 
 
-def main():
+def main() -> None:
     pass
 
 
