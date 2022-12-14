@@ -23,6 +23,39 @@ __version__ = "0.1.0"
 __date__ = "2022-12-13"
 
 
+class RemoverTool(object):
+    """
+    Remover Tool allows you to remove unwanted files from target directory.
+    """
+    def __init__(
+            self,
+            version: str = None,
+            date: str = None
+    ):
+        self.version_app = version
+        self.date_app = date
+        self.copyright = (
+            "2022",
+            "Michael Da Rosa (micheldarosazxc@gmail.com)"
+        )
+
+        self.home_path = os.getenv("HOME")
+
+    def run(self):
+        """Execute object methods."""
+
+    def version_flag(self):
+        """Print a notice of program information."""
+
+        print("Remover Tool %s %s" % (self.version_app, self.date_app))
+
+        print(f"Copyright (C) {self.copyright[0]}  {self.copyright[1]}\n"
+              "This is free software, and you are welcome "
+              "to redistribute it\nunder certain conditions;"
+              "see source code for more information.\n"
+              "This program comes with ABSOLUTELY NO WARRANTY.")
+
+
 def make_usr_folders(platform: str) -> None:
     """Make main, config and data folders in platform win32 or linux.
     .remover-tool/ folder save configuration and data of user.
@@ -63,31 +96,9 @@ def make_usr_folders(platform: str) -> None:
         print("[!] Platform [%s] isn't defined.")
 
 
-def help_flag() -> None:
-    """Print manual page."""
-
-    print("Usage: rmtool [options] folder")
-    print("Options:")
-    print("<<< definir opciones posteriormente >>>")
-
-
-def version_flag(version: str, date: str) -> None:
-    """Print a notice of program information."""
-
-    print("Remover Tool %s %s" % (version, date.replace("-", "")))
-
-    print("Copyright (C) 2022  Michael Da Rosa "
-          "(micheldarosazxc@gmail.com)\n"
-          "This is free software, and you are welcome "
-          "to redistribute it\nunder certain conditions;"
-          "see source code for more information.\n"
-          "This program comes with ABSOLUTELY NO WARRANTY.")
-
-
-def main() -> None:
-    pass
-
-
 # ----------------------------------------------------------------------
 if __name__ == "__main__":
-    main()
+    RemoverTool(
+        __version__,
+        __date__.replace("-", "")
+    ).run()
