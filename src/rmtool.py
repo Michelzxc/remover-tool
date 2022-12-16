@@ -18,82 +18,156 @@
 # ----------------------------------------------------------------------
 import os
 import sys
+import argparse
 
 __version__ = "0.1.0"
-__date__ = "2022-12-13"
+__date__ = "2022-12-17"
+
+
+def print2(*values, end="\n", mude=False) -> None:
+    """A builtins function print with power switch.
+    If mude is True, print nothing.
+    """
+
+    if not mude:
+        print(*values, end=end)
 
 
 class RemoverTool(object):
     """
     Remover Tool allows you to remove unwanted files from target directory.
     """
+
     def __init__(
             self,
             version: str = None,
             date: str = None
-    ):
-        self.version_app = version
-        self.date_app = date
-        self.copyright = (
-            "2022",
-            "Michael Da Rosa (micheldarosazxc@gmail.com)"
-        )
+    ) -> None:
+        self.version = f"Remover Tool {version} {date}"
 
+        self.copyright = (f"Remover Tool {version} \n\n"
+                          "Copyright (C) 2022  Michael Da Rosa "
+                          "(micheldarosazxc@gmail.com).\n"
+                          "This is free software, and you are welcome "
+                          "to redistribute it\nunder certain conditions; "
+                          "see source code for more information.\n"
+                          "This program comes with ABSOLUTELY NO WARRANTY.")
+
+        self.platform = sys.platform[:]
         self.home_path = os.getenv("HOME")
 
-    def run(self):
-        """Execute object methods."""
+        # Input
+        self.target_path = None
+        self.flag_recursion = False
+        self.flag_noconfirm = False
+        self.flag_quiet = False
+        self.flag_undo = False
+        self.flag_delete = False
 
-    def version_flag(self):
-        """Print a notice of program information."""
+    def run(self) -> None:
+        """Execute application script."""
 
-        print("Remover Tool %s %s" % (self.version_app, self.date_app))
+        self.get_argparse()  # First input arguments
 
-        print(f"Copyright (C) {self.copyright[0]}  {self.copyright[1]}\n"
-              "This is free software, and you are welcome "
-              "to redistribute it\nunder certain conditions;"
-              "see source code for more information.\n"
-              "This program comes with ABSOLUTELY NO WARRANTY.")
+    def get_argparse(self) -> None:
+        """Get argument from shell."""
 
+        parser = argparse.ArgumentParser(
+            prog="Remover Tool",
+            description="Remove unwanted files from target directory.",
+            epilog=self.copyright
+        )
 
-def make_usr_folders(platform: str) -> None:
-    """Make main, config and data folders in platform win32 or linux.
-    .remover-tool/ folder save configuration and data of user.
-    """
+        # Flags
+        parser.add_argument(
+            "-q", "--quiet",
+            action="store_true",
+            help="Not print operations in stdout."
+        )
+        parser.add_argument(
+            "-y", "--yes",
+            action="store_true",
+            help="Does not ask for confirmation."
+        )
+        parser.add_argument(
+            "-r", "--recursive",
+            action="store_true",
+            help="Allow recursivity."
+        )
+        parser.add_argument(
+            "-u", "--undo",
+            action="store_true",
+            help="Undo is if possible the previous removing"
+        )
+        parser.add_argument(
+            "-D", "--delete",
+            action="store_true",
+            help="Permanently delete the files in cache."
+        )
+        parser.add_argument(
+            "-v", "--version",
+            action="version",
+            version=self.version
+        )
 
-    # Make folders for Linux
-    if platform == "linux":
-        home_path = os.getenv("HOME")
-        main_folder = home_path + "/.remover-tool"
-        config_folder = main_folder + "/config"
-        data_folder = main_folder + "/data"
+        # Names
+        parser.add_argument(
+            "path",
+            help="Directory target for remove files."
+        )
 
-        for path in [main_folder, config_folder, data_folder]:
-            try:
-                os.mkdir(path)
+        # Get arguments
+        args = parser.parse_args()
 
-            except FileExistsError:
-                print("[!] Folder is already exist: %s" % path)
+        self.target_path = args.path
+        self.flag_noconfirm = args.yes
+        self.flag_quiet = args.quiet
+        self.flag_recursion = args.recursive
+        self.flag_delete = args.delete
+        self.flag_undo = args.undo
 
-    # Make folders for Windows
-    elif platform == "win32":
+    def make_usr_folders(self) -> None:
+        """Make main, global config and cache folders.
+        .remover-tool/ folder save global configuration and data cache of user.
+        """
 
-        # <<< It is necessary to verify the working of this block. >>>
+        # Make folders for Linux
+        if self.platform == "linux":
+            main_folder = self.home_path + "/.remover-tool"
+            config_folder = main_folder + "/config"
+            cache_folder = main_folder + "/cache"
 
-        home_path = os.getenv("HOME")
-        main_folder = home_path + "/AppData/Local/remover-tool"
-        config_folder = main_folder + "/config"
-        data_folder = main_folder + "/data"
+            for path in [main_folder, config_folder, cache_folder]:
+                try:
+                    os.mkdir(path)
 
-        for path in [main_folder, config_folder, data_folder]:
-            try:
-                os.mkdir(path)
+                except FileExistsError:
+                    print2(
+                        "[!] Folder is already exist: %s" % path,
+                        mude=self.flag_quiet
+                    )
 
-            except FileExistsError:
-                print("[!] Folder is already exist: %s" % path)
+        # Make folders for Windows
+        elif platform == "win32":
 
-    else:
-        print("[!] Platform [%s] isn't defined.")
+            # <<< It is necessary to verify the working of this block. >>>
+
+            main_folder = self.home_path + "/AppData/Local/remover-tool"
+            config_folder = main_folder + "/config"
+            cache_folder = main_folder + "/cache"
+
+            for path in [main_folder, config_folder, cache_folder]:
+                try:
+                    os.mkdir(path)
+
+                except FileExistsError:
+                    print2(
+                        "[!] Folder is already exist: %s" % path,
+                        mude=self.flag_quiet
+                    )
+
+        else:
+            print2("[!] Platform [%s] isn't defined.", mude=self.flag_quiet)
 
 
 # ----------------------------------------------------------------------
