@@ -58,16 +58,24 @@ class RemoverTool(object):
 
         # Input
         self.target_path = None
-        self.flag_recursion = False
+        # self.flag_recursion = False
         self.flag_noconfirm = False
+        self.flag_verbose = False
         self.flag_quiet = False
         self.flag_undo = False
         self.flag_delete = False
+        self.flag_exclude_mode = False
+
+        self.exclude = []
 
     def run(self) -> None:
         """Execute application script."""
 
         self.get_argparse()  # First input arguments
+        self.make_usr_folders()
+        if self.flag_exclude_mode:
+            self.exclusion_interface()
+            sys.exit()
 
     def get_argparse(self) -> None:
         """Get argument from shell."""
@@ -78,53 +86,68 @@ class RemoverTool(object):
             epilog=self.copyright
         )
 
-        # Flags
+        qv_group = parser.add_mutually_exclusive_group()
+        du_group = parser.add_mutually_exclusive_group()
+
+        # Names
         parser.add_argument(
+            "dirpath",
+            help="directory target for remove files."
+        )
+
+        # Flags
+        qv_group.add_argument(
+            "-v", "--verbose",
+            action="store_true",
+            help="show all messages."
+        )
+        qv_group.add_argument(
             "-q", "--quiet",
             action="store_true",
-            help="Not print operations in stdout."
+            help="not print operations in stdout."
+        )
+        parser.add_argument(
+            "-e", "--exclude",
+            action="store_true",
+            help="add new files and extensions types to exclude"
         )
         parser.add_argument(
             "-y", "--yes",
             action="store_true",
-            help="Does not ask for confirmation."
+            help="does not ask for confirmation."
         )
-        parser.add_argument(
-            "-r", "--recursive",
-            action="store_true",
-            help="Allow recursivity."
-        )
-        parser.add_argument(
+        # parser.add_argument(
+        #     "-r", "--recursive",
+        #     action="store_true",
+        #     help="Allow recursive."
+        # )
+        du_group.add_argument(
             "-u", "--undo",
             action="store_true",
-            help="Undo is if possible the previous removing"
+            help="undo is if possible the previous removing"
         )
-        parser.add_argument(
+        du_group.add_argument(
             "-D", "--delete",
             action="store_true",
-            help="Permanently delete the files in cache."
+            help="permanently delete the files in cache."
         )
         parser.add_argument(
-            "-v", "--version",
+            "--version",
             action="version",
             version=self.version
-        )
-
-        # Names
-        parser.add_argument(
-            "path",
-            help="Directory target for remove files."
         )
 
         # Get arguments
         args = parser.parse_args()
 
-        self.target_path = args.path
+        self.target_path = args.dirpath
         self.flag_noconfirm = args.yes
+        self.flag_verbose = args.verbose
         self.flag_quiet = args.quiet
-        self.flag_recursion = args.recursive
+        # self.flag_recursion = args.recursive
         self.flag_delete = args.delete
         self.flag_undo = args.undo
+        self.flag_exclude_mode = args.exclude
 
     def make_usr_folders(self) -> None:
         """Make main, global config and cache folders.
@@ -144,7 +167,7 @@ class RemoverTool(object):
                 except FileExistsError:
                     print2(
                         "[!] Folder is already exist: %s" % path,
-                        mude=self.flag_quiet
+                        mude=not self.flag_verbose
                     )
 
         # Make folders for Windows
@@ -163,11 +186,40 @@ class RemoverTool(object):
                 except FileExistsError:
                     print2(
                         "[!] Folder is already exist: %s" % path,
-                        mude=self.flag_quiet
+                        mude=not self.flag_verbose
                     )
 
         else:
-            print2("[!] Platform [%s] isn't defined.", mude=self.flag_quiet)
+            print2(
+                "[!] Platform [%s] isn't defined.",
+                mude=not self.flag_verbose
+            )
+
+    def exclusion_interface(self) -> None:
+        """Make interface for set exclusions."""
+
+        print("# Exclusion mode\n")
+        print("allow set files and extensions exclude for tarjet directory.\n")
+
+        print("current exclusions: \n%s\n" % ", ".join(self.exclude))
+        print("current directory tarjet: \n%s\n" % self.target_path)
+
+        while
+        print(
+            "select task:\n"
+            "1. set new excludes\n"
+            "2.delete a current exclude\n"
+            "3. clear current excludes\n"
+            "4. exit\n"
+        )
+
+
+
+    def get_exclude_configuration(self) -> None:
+        """Get exclusion files and extensions."""
+
+    def set_exclude_configuration(self) -> None:
+        """Set exclusion files and extensions."""
 
 
 # ----------------------------------------------------------------------
