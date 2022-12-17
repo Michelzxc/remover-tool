@@ -24,6 +24,57 @@ __version__ = "0.1.0"
 __date__ = "2022-12-17"
 
 
+def menu_select_task(show_menu=True) -> int:
+    """Print list of tasks and ask for one."""
+
+    if show_menu:
+        print(
+            "select task:\n"
+            # -1. return failed ask
+            "0. exit\n"
+            "1. save configure\n"
+            "2. delete a current exclude\n"
+            "3. clear current excludes\n"
+            "4. set new excludes\n"
+        )
+
+    task = input(">>> ")
+    try:
+        int_task = int(task)
+
+    except ValueError:
+        print("[!] unexpected value '%s'" % task)
+        return -1
+
+    if int_task <= 0:
+        return 0
+
+    elif int_task >= 4:
+        return 4
+
+    else:
+        return int_task
+
+
+def set_new_file_exclusion_menu() -> list:
+    """Set new files excludes."""
+
+    print(
+        "=> Set new excluded files and extensions, "
+        "(type 0 to return, or 1 to save)."
+    )
+    content_list = []
+    while True:
+        new_entry = input(">>> ")
+        if new_entry == "1":
+            return content_list
+
+        elif new_entry == "0":
+            return []
+
+        content_list.append(new_entry)
+
+
 def print2(*values, end="\n", mude=False) -> None:
     """A builtins function print with power switch.
     If mude is True, print nothing.
@@ -73,6 +124,7 @@ class RemoverTool(object):
 
         self.get_argparse()  # First input arguments
         self.make_usr_folders()
+        self.get_excluded_files()
         if self.flag_exclude_mode:
             self.exclusion_interface()
             sys.exit()
@@ -200,25 +252,42 @@ class RemoverTool(object):
 
         print("# Exclusion mode\n")
         print("allow set files and extensions exclude for tarjet directory.\n")
-
-        print("current exclusions: \n%s\n" % ", ".join(self.exclude))
+        if len(self.exclude) < 1:
+            print("current exclusions: \n...\n")
+        else:
+            print("current exclusions: \n%s\n" % ", ".join(self.exclude))
         print("current directory tarjet: \n%s\n" % self.target_path)
 
-        while
-        print(
-            "select task:\n"
-            "1. set new excludes\n"
-            "2.delete a current exclude\n"
-            "3. clear current excludes\n"
-            "4. exit\n"
-        )
+        excluded_content = []
+        excluded_content.extend(self.exclude)
+        show_menu_tasks = True
+        while True:
+            answer = menu_select_task(show_menu_tasks)
+            show_menu_tasks = False
+            if answer == -1:
+                continue
 
+            elif answer == 4:
+                pass
 
+            elif answer == 3:
+                excluded_content.clear()
 
-    def get_exclude_configuration(self) -> None:
+            elif answer == 2:
+                excluded_content.extend(set_new_file_exclusion_menu())
+                show_menu_tasks = True
+
+            elif answer == 1:
+                self.exclude.clear()
+                self.exclude.extend(excluded_content)
+
+            elif answer == 0:
+                sys.exit()
+
+    def get_excluded_files(self) -> None:
         """Get exclusion files and extensions."""
 
-    def set_exclude_configuration(self) -> None:
+    def set_excluded_files(self) -> None:
         """Set exclusion files and extensions."""
 
 
