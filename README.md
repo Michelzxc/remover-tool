@@ -7,7 +7,3 @@ Remover Tool allows you to do exactly this by moving those files to a separate d
 ---
 
 > Remover Tool **DOES NOT ***DELETE*** ANYTHING**, so you don't have to worry about losing something.
-
----
-
-<Agregar documentación de parámetros del programa>
