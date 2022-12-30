@@ -20,6 +20,7 @@
 import os
 import sys
 import argparse
+from fclib import printq, notice
 
 
 class RemoverTool(object):
@@ -33,6 +34,10 @@ class RemoverTool(object):
 
         self._version = None
         self._copyright = None
+        self._cwd = None
+        self._mude = True
+
+        self.exclude_files = []  # Files and extensions excluded
 
     def run(self) -> None:
         """Run application."""
@@ -49,3 +54,20 @@ class RemoverTool(object):
                            "to redistribute it\nunder certain conditions; "
                            "see source code for more information.\n"
                            "This program comes with ABSOLUTELY NO WARRANTY.")
+
+        # Get Current Working Directory
+        self._cwd = os.getcwd()
+
+    def load_rmignore(self):
+        """Load content of .rmignore file."""
+
+        try:
+            with open(self._cwd, "r") as rmignorefile:
+                for row in rmignorefile:
+                    if "\n" in row:
+                        self.exclude_files.append(row[:-1])
+                    else:
+                        self.exclude_files.append(row)
+
+        except FileNotFoundError:
+            printq("")

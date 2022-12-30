@@ -25,6 +25,6 @@ __date__ = "2022-12-30"
 if __name__ == "__main__":
     app = RemoverTool()
     app.raw_version, app.raw_date = __version__, __date__.replace("-", "")
+    app._mude = True
 
     app.run()
-
